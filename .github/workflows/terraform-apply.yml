@@ -32,7 +32,7 @@ jobs:
         run: terraform -chdir=infra plan
 
       - name: Terraform Targeted Apply (EKS)
-        run: terraform -chdir=infra apply -target=module.eks.aws_eks_cluster.1.31 -auto-approve
+        run: terraform -chdir=infra apply -target=module.eks.aws_eks_cluster -auto-approve
         env:
           TF_VAR_aws_region: ${{ env.AWS_REGION }}
 
