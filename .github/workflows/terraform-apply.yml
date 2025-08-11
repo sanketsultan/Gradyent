@@ -1,0 +1,37 @@
+name: Terraform Apply
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - infra/**
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: eu-west-1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        run: terraform -chdir=infra init
+
+      - name: Terraform Plan
+        run: terraform -chdir=infra plan
+
+      - name: Terraform Apply
+        run: terraform -chdir=infra apply -auto-approve
+        env:
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
