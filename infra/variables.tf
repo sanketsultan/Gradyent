@@ -69,3 +69,9 @@ variable "node_instance_types" {
   type        = list(string)
   default     = ["t2.micro"]
 }
+
+variable "create_state_resources" {
+  description = "Whether to create S3 and DynamoDB resources for Terraform remote state in this stack"
+  type        = bool
+  default     = false
+}

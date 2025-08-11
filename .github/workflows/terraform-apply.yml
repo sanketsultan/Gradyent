@@ -1,7 +1,16 @@
-name: Terraform Apply
+name: Terraform Apply/Destroy
 
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: "Choose whether to apply or destroy"
+        required: true
+        default: apply
+        type: choice
+        options:
+          - apply
+          - destroy
   push:
     paths:
       - infra/**
@@ -28,10 +37,24 @@ jobs:
       - name: Terraform Init
         run: terraform -chdir=infra init
 
-      - name: Terraform Plan
+      - name: Terraform Plan (Apply)
+        if: ${{ (github.event.inputs.action || 'apply') == 'apply' }}
         run: terraform -chdir=infra plan
 
+      # - name: Terraform Targeted Apply (EKS)
+      #   if: ${{ (github.event.inputs.action || 'apply') == 'apply' }}
+      #   run: terraform -chdir=infra apply -target=module.eks -auto-approve
+      #   env:
+      #     TF_VAR_aws_region: ${{ env.AWS_REGION }}
+
       - name: Terraform Full Apply
+        if: ${{ (github.event.inputs.action || 'apply') == 'apply' }}
         run: terraform -chdir=infra apply -auto-approve
+        env:
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Destroy (Clean)
+        if: ${{ (github.event.inputs.action || 'apply') == 'destroy' }}
+        run: terraform -chdir=infra destroy -auto-approve
         env:
           TF_VAR_aws_region: ${{ env.AWS_REGION }}
