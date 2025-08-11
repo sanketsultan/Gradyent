@@ -40,10 +40,10 @@ variable "cluster_name" {
   default     = "gradyent-eks"
 }
 
-variable "cluster_version" {
+variable "kubernetes_version" {
   description = "Kubernetes version for EKS"
   type        = string
-  default     = "1.31"
+  default     = "1.29"
 }
 
 variable "node_desired_capacity" {

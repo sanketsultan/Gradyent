@@ -11,6 +11,7 @@ module "eks" {
       max_size       = var.node_max_capacity
       min_size       = var.node_min_capacity
       instance_types = var.node_instance_types
+      kubernetes_version = var.kubernetes_version
     }
   }
 

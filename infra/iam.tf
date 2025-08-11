@@ -51,3 +51,36 @@ data "aws_iam_policy_document" "irsa_assume_role_policy" {
 }
 
 data "aws_caller_identity" "current" {}
+
+# Inline policy for the IAM user running Terraform to read EKS AMI SSM parameters
+data "aws_iam_policy_document" "ssm_read_eks_ami_params" {
+	statement {
+		sid     = "AllowReadEKSAMIParams"
+		effect  = "Allow"
+		actions = [
+			"ssm:GetParameter",
+			"ssm:GetParameters",
+			"ssm:GetParametersByPath",
+			"ssm:DescribeParameters"
+		]
+		resources = [
+			"arn:aws:ssm:${var.aws_region}:*:parameter/aws/service/eks/*"
+		]
+	}
+
+	# Some lookups may require describing images; this action doesn't support resource-level permissions
+	statement {
+		sid     = "AllowDescribeImages"
+		effect  = "Allow"
+		actions = [
+			"ec2:DescribeImages"
+		]
+		resources = ["*"]
+	}
+}
+
+resource "aws_iam_user_policy" "gradyent_ssm_read" {
+	name   = "AllowReadEKSAMIParams"
+	user   = "gradyent"
+	policy = data.aws_iam_policy_document.ssm_read_eks_ami_params.json
+}
