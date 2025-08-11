@@ -36,7 +36,7 @@ jobs:
 
       - name: Terraform Init (Apply - migrate state to S3)
         if: ${{ (github.event.inputs.action || 'apply') == 'apply' }}
-        run: terraform -chdir=infra init -migrate-state -reconfigure
+        run: terraform -chdir=infra init -migrate-state
 
       - name: Terraform Init (Destroy - reconfigure backend)
         if: ${{ (github.event.inputs.action || 'apply') == 'destroy' }}
@@ -48,7 +48,7 @@ jobs:
 
       - name: Terraform Pull Remote State (Destroy)
         if: ${{ (github.event.inputs.action || 'apply') == 'destroy' }}
-        run: terraform -chdir=infra state pull > terraform.tfstate
+        run: terraform -chdir=infra state pull > infra/terraform.tfstate
 
       # - name: Terraform Targeted Apply (EKS)
       #   if: ${{ (github.event.inputs.action || 'apply') == 'apply' }}
