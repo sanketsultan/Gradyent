@@ -76,8 +76,3 @@ variable "create_state_resources" {
   default     = false
 }
 
-variable "prevent_destroy_state" {
-  description = "Protect remote state resources (S3 bucket and DynamoDB lock table) from accidental destroy"
-  type        = bool
-  default     = true
-}
