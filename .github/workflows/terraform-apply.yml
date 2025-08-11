@@ -31,7 +31,12 @@ jobs:
       - name: Terraform Plan
         run: terraform -chdir=infra plan
 
-      - name: Terraform Apply
+      - name: Terraform Targeted Apply (EKS)
+        run: terraform -chdir=infra apply -target=module.eks -auto-approve
+        env:
+          TF_VAR_aws_region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Full Apply
         run: terraform -chdir=infra apply -auto-approve
         env:
           TF_VAR_aws_region: ${{ env.AWS_REGION }}
