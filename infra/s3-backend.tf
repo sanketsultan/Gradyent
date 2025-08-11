@@ -2,6 +2,9 @@ resource "aws_s3_bucket" "terraform_state" {
   count  = var.create_state_resources ? 1 : 0
   bucket = "gradyent-terraform-state"
   force_destroy = true
+  lifecycle {
+    prevent_destroy = var.prevent_destroy_state
+  }
   tags = {
     Name        = "Terraform State Bucket"
     Environment = "dev"
@@ -31,6 +34,9 @@ resource "aws_dynamodb_table" "terraform_locks" {
   name         = "terraform-lock-table"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
+  lifecycle {
+    prevent_destroy = var.prevent_destroy_state
+  }
   attribute {
     name = "LockID"
     type = "S"

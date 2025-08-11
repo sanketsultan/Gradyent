@@ -43,7 +43,7 @@ variable "cluster_name" {
 variable "kubernetes_version" {
   description = "Kubernetes version for EKS"
   type        = string
-  default     = "1.29"
+  default     = "1.33"
 }
 
 variable "node_desired_capacity" {
@@ -74,4 +74,10 @@ variable "create_state_resources" {
   description = "Whether to create S3 and DynamoDB resources for Terraform remote state in this stack"
   type        = bool
   default     = false
+}
+
+variable "prevent_destroy_state" {
+  description = "Protect remote state resources (S3 bucket and DynamoDB lock table) from accidental destroy"
+  type        = bool
+  default     = true
 }
