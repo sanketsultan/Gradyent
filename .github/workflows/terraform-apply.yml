@@ -34,12 +34,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terraform Init
-        run: terraform -chdir=infra init
+      - name: Terraform Init (Apply - migrate state to S3)
+        if: ${{ (github.event.inputs.action || 'apply') == 'apply' }}
+        run: terraform -chdir=infra init -migrate-state -reconfigure
+
+      - name: Terraform Init (Destroy - reconfigure backend)
+        if: ${{ (github.event.inputs.action || 'apply') == 'destroy' }}
+        run: terraform -chdir=infra init -reconfigure
 
       - name: Terraform Plan (Apply)
         if: ${{ (github.event.inputs.action || 'apply') == 'apply' }}
         run: terraform -chdir=infra plan
+
+      - name: Terraform Pull Remote State (Destroy)
+        if: ${{ (github.event.inputs.action || 'apply') == 'destroy' }}
+        run: terraform -chdir=infra state pull > terraform.tfstate
 
       # - name: Terraform Targeted Apply (EKS)
       #   if: ${{ (github.event.inputs.action || 'apply') == 'apply' }}

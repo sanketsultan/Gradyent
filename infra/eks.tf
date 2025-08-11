@@ -2,7 +2,8 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "21.0.6"
   name    = var.cluster_name
-  subnet_ids = module.vpc.private_subnets
+  # Place nodes in public subnets to avoid NAT/EIP usage
+  subnet_ids = module.vpc.public_subnets
   vpc_id     = module.vpc.vpc_id
 
   eks_managed_node_groups = {

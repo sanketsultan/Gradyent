@@ -6,5 +6,6 @@ module "vpc" {
   azs     = var.availability_zones
   public_subnets  = var.public_subnets
   private_subnets = var.private_subnets
-  enable_nat_gateway = true
+  # Disable NAT gateways to avoid allocating Elastic IPs
+  enable_nat_gateway = false
 }
