@@ -1,3 +1,17 @@
+variable "node_group_role_name" {
+  description = "IAM Role Name for EKS node group"
+  type        = string
+  default     = "gradyent-node-group"
+}
+variable "aws_account_id" {
+  description = "AWS Account ID"
+  type        = string
+}
+variable "iam_role_name" {
+  description = "IAM role name for admin"
+  type        = string
+  default     = "gradyent-admin"
+}
 variable "aws_region" {
   description = "AWS region to deploy resources"
   type        = string
