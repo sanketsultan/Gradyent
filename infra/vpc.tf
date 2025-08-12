@@ -8,4 +8,6 @@ module "vpc" {
   private_subnets = var.private_subnets
   # Disable NAT gateways to avoid allocating Elastic IPs
   enable_nat_gateway = false
+  # Ensure instances launched in public subnets get a public IPv4
+  map_public_ip_on_launch = true
 }
