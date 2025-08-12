@@ -29,3 +29,8 @@ resource "aws_iam_role_policy_attachment" "node_group_AmazonSSMManagedInstanceCo
   role       = aws_iam_role.node_group.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
+
+resource "aws_iam_role_policy_attachment" "node_group_AmazonEBSCSIDriverPolicy" {
+  role       = aws_iam_role.node_group.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
