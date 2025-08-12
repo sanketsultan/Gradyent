@@ -26,12 +26,6 @@ module "eks" {
   }
 
   addons = {
-    vpc-cni = {
-      lifecycle = {
-        create_before_destroy = true
-        ignore_changes = []
-      }
-    }
     kube-proxy = {
       lifecycle = {
         create_before_destroy = true
@@ -39,12 +33,6 @@ module "eks" {
       }
     }
     coredns = {
-      lifecycle = {
-        create_before_destroy = true
-        ignore_changes = []
-      }
-    }
-    aws-ebs-csi-driver = {
       lifecycle = {
         create_before_destroy = true
         ignore_changes = []
