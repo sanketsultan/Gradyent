@@ -24,4 +24,10 @@ module "eks" {
   compute_config = {
     enabled = true
   }
+
+  addons = {
+    vpc-cni = {}
+    kube-proxy = {}
+    coredns = {}
+  }
 }
