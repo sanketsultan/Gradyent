@@ -7,6 +7,9 @@ locals {
     "ec2",
     "elasticloadbalancing",
     "eks",
+    "ssm",
+    "ssmmessages",
+    "ec2messages"
   ]
 }
 
