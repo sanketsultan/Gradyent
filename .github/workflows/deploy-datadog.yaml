@@ -36,4 +36,9 @@ jobs:
         run: |
           helm repo add datadog https://helm.datadoghq.com
           helm repo update
-          helm upgrade --install datadog-agent datadog/datadog -f observability/datadog-values.yaml
+          helm upgrade --install datadog-agent datadog/datadog -f observability/datadog-values.yaml --namespace datadog
+
+      - name: Check Datadog Agent pods status
+        run: |
+          kubectl get pods -n datadog
+          kubectl wait --for=condition=Ready pod -l app=datadog-agent -n datadog --timeout=120s
