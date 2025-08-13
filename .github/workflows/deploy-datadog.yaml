@@ -42,7 +42,10 @@ jobs:
         run: |
           helm repo add datadog https://helm.datadoghq.com
           helm repo update
-          helm upgrade --install datadog-agent datadog/datadog -f observability/datadog-values.yaml --namespace datadog
+          helm upgrade --install datadog-agent datadog/datadog \
+              --namespace datadog \
+              --set datadog.apiKey=$DATADOG_API_KEY \
+              -f observability/datadog-values.yaml
 
       - name: Check Datadog Agent pods status
         run: |
