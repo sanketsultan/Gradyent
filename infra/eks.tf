@@ -41,8 +41,5 @@ module "eks" {
         ignore_changes = []
       }
     }
-    vpc-cni = {
-      
-    }
   }
 }
