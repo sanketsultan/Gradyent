@@ -6,7 +6,7 @@ resource "kubernetes_config_map" "aws_auth" {
 
   data = {
       mapRoles = <<EOF
-        - rolearn: ${aws_iam_role.node_group.arn}
+        - rolearn: arn:aws:iam::${var.aws_account_id}:role/${var.node_group_role_name}
           username: system:node:{{EC2PrivateDNSName}}
           groups:
             - system:bootstrappers
@@ -16,17 +16,17 @@ resource "kubernetes_config_map" "aws_auth" {
           groups:
             - system:masters
         # Local user access (replace with your actual ARN)
-        - rolearn: arn:aws:iam::375459824176:user/gradyent
+        - rolearn: arn:aws:iam::${var.aws_account_id}:user/gradyent
           username: gradyent
           groups:
             - system:masters
         # GitHub Actions uses the same IAM user
-        - rolearn: arn:aws:iam::375459824176:user/gradyent
+        - rolearn: arn:aws:iam::${var.aws_account_id}:user/gradyent
           username: gradyent
           groups:
             - system:masters
           # GitHub Actions workflow IAM role (replace with actual role ARN)
-          - rolearn: arn:aws:iam::375459824176:role/github-actions-role
+          - rolearn: arn:aws:iam::${var.aws_account_id}:role/github-actions-role
             username: github-actions
             groups:
               - system:masters

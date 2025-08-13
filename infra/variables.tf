@@ -6,6 +6,7 @@ variable "node_group_role_name" {
 variable "aws_account_id" {
   description = "AWS Account ID"
   type        = string
+  default     = "375459824176"
 }
 variable "iam_role_name" {
   description = "IAM role name for admin"
