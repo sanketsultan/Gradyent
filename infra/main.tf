@@ -18,3 +18,8 @@ terraform {
 provider "aws" {
   region = var.aws_region
 }
+
+provider "kubernetes" {
+  config_path    = "~/.kube/config"
+  config_context = "arn:aws:eks:eu-west-1:375459824176:cluster/gradyent-eks"
+}
