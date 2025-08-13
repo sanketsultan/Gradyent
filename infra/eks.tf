@@ -1,6 +1,6 @@
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "21.0.6"
+  version = "21.0.8"
   name    = var.cluster_name
   subnet_ids = module.vpc.private_subnets
   vpc_id     = module.vpc.vpc_id
@@ -16,9 +16,6 @@ module "eks" {
       kubernetes_version = var.kubernetes_version
       iam_role_arn = aws_iam_role.node_group.arn
       security_group_ids = [aws_security_group.eks_node_group.id]
-      cluster_endpoint_private_access = false
-      cluster_endpoint_public_access = true
-      cidr_blocks = "0.0.0.0/0"
     }
   }
 
@@ -40,6 +37,11 @@ module "eks" {
         create_before_destroy = true
         ignore_changes = []
       }
+    }
+    vpc-config = {
+      cluster_endpoint_public_access = true
+      cluster_endpoint_private_access = false
+      cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
     }
   }
 }
