@@ -44,7 +44,11 @@ jobs:
           kubectl get pods -n gradyent-task
           kubectl get svc -n gradyent-task
           nohup kubectl port-forward svc/gradyent-task 8080:8080 -n gradyent-task &
-          sleep 10
+          sleep 20
+          ps aux | grep kubectl
+          netstat -an | grep 8080
+          POD_NAME=$(kubectl get pods -n gradyent-task -o jsonpath='{.items[0].metadata.name}')
+          kubectl logs $POD_NAME -n gradyent-task
 
       - name: API Test
         run: |
