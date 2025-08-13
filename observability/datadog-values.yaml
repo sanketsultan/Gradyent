@@ -1,5 +1,5 @@
 datadog:
-  apiKey: "{{ .Env.DATADOG_API_KEY }}"
+  apiKey: ${DATADOG_API_KEY}
   site: "datadoghq.eu"
 daemonset:
   nodeSelector: {}
