@@ -35,8 +35,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
 
-      # - name: Update kubeconfig
-      #   run: aws eks update-kubeconfig --region eu-west-1 --name gradyent-eks
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region eu-west-1 --name gradyent-eks
 
       - name: Terraform Init (Apply - migrate state to S3)
         if: ${{ (github.event.inputs.action || 'apply') == 'apply' }}
