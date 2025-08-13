@@ -13,7 +13,7 @@ resource "aws_iam_role" "gradyent_admin" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::375459824176:user/gradyent"
+          AWS = "arn:aws:iam::${var.aws_account_id}:user/gradyent"
         }
         Action = "sts:AssumeRole"
       }

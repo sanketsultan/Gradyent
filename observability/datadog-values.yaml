@@ -5,3 +5,7 @@ daemonset:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  updateStrategy:
+    type: RollingUpdate
+  podAnnotations:
+    datadog-agent-pod-limit: "5"
