@@ -30,6 +30,11 @@ resource "kubernetes_config_map" "aws_auth" {
             username: github-actions
             groups:
               - system:masters
+        - rolearn: arn:aws:iam::${var.aws_account_id}:role/gradyent-node-group
+          username: system:node:{{EC2PrivateDNSName}}
+          groups:
+            - system:bootstrappers
+            - system:nodes
       EOF
   }
 }
