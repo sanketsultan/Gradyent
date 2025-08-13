@@ -1,7 +1,6 @@
 provider "helm" {
   kubernetes {
-    config_path    = "~/.kube/config"
-    config_context = "gradyent-eks"
+    config_path = "~/.kube/config"
   }
 }
 
