@@ -4,9 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       test_type:
-        description: 'Type of test to run smoke or load'
-        required: true
-        default: 'smoke'
+          description: 'Type of test to run'
+          required: true
+          default: 'smoke'
+          options:
+            - smoke
+            - load
       request_count:
         description: 'Number of requests for load test'
         required: false
@@ -42,12 +45,13 @@ jobs:
 
       - name: API Test
         run: |
-          if [ "${{ github.event.inputs.test_type }}" = "smoke" ]; then
+          TEST_TYPE="${{ github.event.inputs.test_type }}"
+          REQUEST_COUNT="${{ github.event.inputs.request_count }}"
+          if [ "$TEST_TYPE" = "smoke" ]; then
             curl -sf http://localhost:8080/ | grep -q "OK"
             curl -sf http://localhost:8080/hello | grep -q "world"
             echo "Smoke test passed."
-          elif [ "${{ github.event.inputs.test_type }}" = "load" ]; then
-            REQUEST_COUNT=${{ github.event.inputs.request_count }}
+          elif [ "$TEST_TYPE" = "load" ]; then
             success=0
             for i in $(seq 1 $REQUEST_COUNT); do
               curl -sf http://localhost:8080/ | grep -q "OK" && curl -sf http://localhost:8080/hello | grep -q "world" && success=$((success+1)) || break
@@ -59,6 +63,6 @@ jobs:
               echo "API load test passed: $REQUEST_COUNT requests succeeded."
             fi
           else
-            echo "Unknown test type: ${{ github.event.inputs.test_type }}"
+            echo "Unknown test type: $TEST_TYPE"
             exit 1
           fi
