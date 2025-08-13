@@ -4,11 +4,19 @@ resource "aws_security_group" "eks_cluster" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    description = "Allow Kubernetes API"
+    description = "Allow Kubernetes API from VPC"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr]
+  }
+
+  ingress {
+    description = "Allow Kubernetes API from public internet"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
