@@ -1,0 +1,15 @@
+replicaCount: 2
+image:
+  repository: gradyent/tech-interview
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 8080
+resources: {}
+readinessProbe:
+  path: /
+  port: 8080
+livenessProbe:
+  path: /hello
+  port: 8080
