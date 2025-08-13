@@ -29,11 +29,14 @@ jobs:
         uses: hashicorp/setup-terraform@v3.1.2
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4.3.1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: eu-west-1
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region eu-west-1 --name gradyent-eks
 
       - name: Terraform Init (Apply - migrate state to S3)
         if: ${{ (github.event.inputs.action || 'apply') == 'apply' }}
