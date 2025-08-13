@@ -1,0 +1,3 @@
+datadog:
+  apiKey: "{{ .Env.DATADOG_API_KEY }}"
+  site: "datadoghq.eu"
