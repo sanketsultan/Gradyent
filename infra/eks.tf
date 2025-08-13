@@ -5,8 +5,6 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
   vpc_id     = module.vpc.vpc_id
 
-  # Security groups are set in eks_managed_node_groups only
-
   eks_managed_node_groups = {
     default = {
       desired_size   = var.node_desired_capacity
