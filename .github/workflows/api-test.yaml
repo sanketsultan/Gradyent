@@ -52,27 +52,39 @@ jobs:
 
       - name: API Test
         run: |
+          set -e
           set -x
           TEST_TYPE="${{ github.event.inputs.test_type }}"
           REQUEST_COUNT="${{ github.event.inputs.request_count }}"
+
+          check_api() {
+            root_resp=$(curl -s http://localhost:8080/)
+            hello_resp=$(curl -s http://localhost:8080/hello)
+
+            if [ "$root_resp" != "ok" ]; then
+              echo "FAIL: / endpoint returned '$root_resp' instead of 'ok'"
+              return 1
+            fi
+
+            if [ "$hello_resp" != "world" ]; then
+              echo "FAIL: /hello endpoint returned '$hello_resp' instead of 'world'"
+              return 1
+            fi
+
+            echo "PASS: API returned expected responses."
+            return 0
+          }
+
           if [ "$TEST_TYPE" = "smoke" ]; then
-            curl -v http://localhost:8080/
-            curl -v http://localhost:8080/hello
-            curl -sf http://localhost:8080/ | grep -q "OK"
-            curl -sf http://localhost:8080/hello | grep -q "world"
-            echo "Smoke test passed."
+            check_api
           elif [ "$TEST_TYPE" = "load" ]; then
             success=0
             for i in $(seq 1 $REQUEST_COUNT); do
-              curl -sf http://localhost:8080/ | grep -q "OK" && curl -sf http://localhost:8080/hello | grep -q "world" && success=$((success+1)) || break
+              if check_api; then
+                success=$((success+1))
+              else
+                break
+              fi
             done
             if [ "$success" -ne "$REQUEST_COUNT" ]; then
-              echo "API load test failed: Only $success/$REQUEST_COUNT requests succeeded."
-              exit 1
-            else
-              echo "API load test passed: $REQUEST_COUNT requests succeeded."
-            fi
-          else
-            echo "Unknown test type: $TEST_TYPE"
-            exit 1
-          fi
+              echo "API load test failed: Only $success/$REQUE
