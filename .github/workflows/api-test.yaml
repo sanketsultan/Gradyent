@@ -1,21 +1,55 @@
-name: API Test
+name: API Test on ClusterIP
 
 on:
   workflow_dispatch:
     inputs:
       test_type:
-        description: 'Type of test to run (smoke or load)'
+        description: 'Type of test to run'
         required: true
         default: 'smoke'
+        type: choice
+        options:
+          - smoke
+          - load
       request_count:
         description: 'Number of requests for load test'
         required: false
         default: '10'
+  push:
+    paths:
+      - 'charts/gradyent-task/**'
+      - '.github/workflows/api-test.yaml'
 
 jobs:
-  test:
+  api-test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+          export KUBECONFIG=$HOME/.kube/config
+
+      - name: Port-forward ClusterIP service
+        run: |
+          kubectl get pods -n gradyent-task
+          kubectl get svc -n gradyent-task
+          nohup kubectl port-forward svc/gradyent-task 8080:8080 -n gradyent-task &
+          sleep 5
+          ps aux | grep kubectl
+          netstat -an | grep 8080
+          POD_NAME=$(kubectl get pods -n gradyent-task -o jsonpath='{.items[0].metadata.name}')
+          kubectl logs $POD_NAME -n gradyent-task
+
       - name: Run API Test
         run: |
           set -e
