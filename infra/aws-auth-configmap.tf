@@ -25,6 +25,11 @@ resource "kubernetes_config_map" "aws_auth" {
           username: gradyent
           groups:
             - system:masters
+          # GitHub Actions workflow IAM role (replace with actual role ARN)
+          - rolearn: arn:aws:iam::375459824176:role/github-actions-role
+            username: github-actions
+            groups:
+              - system:masters
       EOF
   }
 }
