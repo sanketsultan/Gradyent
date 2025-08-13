@@ -66,8 +66,8 @@ jobs:
               return 1
             fi
 
-            if [ "$hello_resp" != 'world' ]; then
-              echo "FAIL: /hello endpoint returned '$hello_resp' instead of 'world'"
+            if [ "$hello_resp" != 'world!' ]; then
+              echo "FAIL: /hello endpoint returned '$hello_resp' instead of 'world!'"
               return 1
             fi
 
