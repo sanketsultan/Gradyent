@@ -7,6 +7,7 @@ on:
         description: 'Type of test to run'
         required: true
         default: 'smoke'
+        type: choice
         options:
           - smoke
           - load
@@ -40,14 +41,19 @@ jobs:
 
       - name: Port-forward ClusterIP service
         run: |
+          kubectl get pods -n gradyent-task
+          kubectl get svc -n gradyent-task
           nohup kubectl port-forward svc/gradyent-task 8080:8080 -n gradyent-task &
-          sleep 5
+          sleep 10
 
       - name: API Test
         run: |
+          set -x
           TEST_TYPE="${{ github.event.inputs.test_type }}"
           REQUEST_COUNT="${{ github.event.inputs.request_count }}"
           if [ "$TEST_TYPE" = "smoke" ]; then
+            curl -v http://localhost:8080/
+            curl -v http://localhost:8080/hello
             curl -sf http://localhost:8080/ | grep -q "OK"
             curl -sf http://localhost:8080/hello | grep -q "world"
             echo "Smoke test passed."
