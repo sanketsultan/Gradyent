@@ -6,4 +6,5 @@ variable "datadog_api_key" {
 variable "cluster_name" {
   description = "EKS cluster name for Datadog agent"
   type        = string
+  default     = "gradyent-eks"
 }
