@@ -1,56 +1,22 @@
-name: API Test on ClusterIP
+name: API Test
 
 on:
   workflow_dispatch:
     inputs:
       test_type:
-        description: 'Type of test to run'
+        description: 'Type of test to run (smoke or load)'
         required: true
         default: 'smoke'
-        type: choice
-        options:
-          - smoke
-          - load
       request_count:
         description: 'Number of requests for load test'
         required: false
         default: '10'
-  push:
-    paths:
-      - 'charts/gradyent-task/**'
-      - '.github/workflows/api-test.yaml'
 
 jobs:
-  api-test:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Update kubeconfig for EKS
-        run: |
-          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
-          export KUBECONFIG=$HOME/.kube/config
-
-      - name: Port-forward ClusterIP service
-        run: |
-          kubectl get pods -n gradyent-task
-          kubectl get svc -n gradyent-task
-          nohup kubectl port-forward svc/gradyent-task 8080:8080 -n gradyent-task &
-          sleep 20
-          ps aux | grep kubectl
-          netstat -an | grep 8080
-          POD_NAME=$(kubectl get pods -n gradyent-task -o jsonpath='{.items[0].metadata.name}')
-          kubectl logs $POD_NAME -n gradyent-task
-
-      - name: API Test
+      - name: Run API Test
         run: |
           set -e
           set -x
@@ -61,12 +27,12 @@ jobs:
             root_resp=$(curl -s http://localhost:8080/)
             hello_resp=$(curl -s http://localhost:8080/hello)
 
-            if [ "$root_resp" != "ok" ]; then
+            if [ "$root_resp" != 'ok' ]; then
               echo "FAIL: / endpoint returned '$root_resp' instead of 'ok'"
               return 1
             fi
 
-            if [ "$hello_resp" != "world" ]; then
+            if [ "$hello_resp" != 'world' ]; then
               echo "FAIL: /hello endpoint returned '$hello_resp' instead of 'world'"
               return 1
             fi
@@ -75,11 +41,11 @@ jobs:
             return 0
           }
 
-          if [ "$TEST_TYPE" = "smoke" ]; then
+          if [ "$TEST_TYPE" = 'smoke' ]; then
             check_api
-          elif [ "$TEST_TYPE" = "load" ]; then
+          elif [ "$TEST_TYPE" = 'load' ]; then
             success=0
-            for i in $(seq 1 $REQUEST_COUNT); do
+            for i in $(seq 1 "$REQUEST_COUNT"); do
               if check_api; then
                 success=$((success+1))
               else
@@ -87,4 +53,12 @@ jobs:
               fi
             done
             if [ "$success" -ne "$REQUEST_COUNT" ]; then
-              echo "API load test failed: Only $success/$REQUE
+              echo "API load test failed: Only $success/$REQUEST_COUNT requests succeeded."
+              exit 1
+            else
+              echo "API load test passed: $REQUEST_COUNT requests succeeded."
+            fi
+          else
+            echo "Unknown test type: $TEST_TYPE"
+            exit 1
+          fi
