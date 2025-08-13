@@ -1,0 +1,64 @@
+name: API Test on ClusterIP
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of test to run smoke or load'
+        required: true
+        default: 'smoke'
+      request_count:
+        description: 'Number of requests for load test'
+        required: false
+        default: '10'
+  push:
+    paths:
+      - 'charts/gradyent-task/**'
+      - '.github/workflows/api-test.yaml'
+
+jobs:
+  api-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+          export KUBECONFIG=$HOME/.kube/config
+
+      - name: Port-forward ClusterIP service
+        run: |
+          nohup kubectl port-forward svc/gradyent-task 8080:8080 -n gradyent-task &
+          sleep 5
+
+      - name: API Test
+        run: |
+          if [ "${{ github.event.inputs.test_type }}" = "smoke" ]; then
+            curl -sf http://localhost:8080/ | grep -q "OK"
+            curl -sf http://localhost:8080/hello | grep -q "world"
+            echo "Smoke test passed."
+          elif [ "${{ github.event.inputs.test_type }}" = "load" ]; then
+            REQUEST_COUNT=${{ github.event.inputs.request_count }}
+            success=0
+            for i in $(seq 1 $REQUEST_COUNT); do
+              curl -sf http://localhost:8080/ | grep -q "OK" && curl -sf http://localhost:8080/hello | grep -q "world" && success=$((success+1)) || break
+            done
+            if [ "$success" -ne "$REQUEST_COUNT" ]; then
+              echo "API load test failed: Only $success/$REQUEST_COUNT requests succeeded."
+              exit 1
+            else
+              echo "API load test passed: $REQUEST_COUNT requests succeeded."
+            fi
+          else
+            echo "Unknown test type: ${{ github.event.inputs.test_type }}"
+            exit 1
+          fi
