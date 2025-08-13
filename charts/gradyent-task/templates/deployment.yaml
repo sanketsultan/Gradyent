@@ -40,7 +40,7 @@ spec:
               cpu: "500m"
               memory: "512Mi"
           securityContext:
-            runAsNonRoot: true
+            runAsNonRoot: false
             allowPrivilegeEscalation: false
             capabilities:
               drop:
