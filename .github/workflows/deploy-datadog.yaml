@@ -42,7 +42,7 @@ jobs:
         run: |
           helm repo add datadog https://helm.datadoghq.com
           helm repo update
-          kubectl create secret generic datadog-secret --from-literal api-key=$DATADOG_API_KEY
+          kubectl create secret generic datadog-secret --from-literal api-key=$DATADOG_API_KEY -n datadog
           helm upgrade --install datadog-agent datadog/datadog \
               --namespace datadog \
               -f observability/datadog-values.yaml
