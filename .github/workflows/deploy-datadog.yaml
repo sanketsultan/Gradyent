@@ -30,6 +30,11 @@ jobs:
         with:
           version: 'latest'
 
+      - name: Pre-cleanup conflicting Datadog resources
+        run: |
+          kubectl delete clusterrole datadog-agent-cluster-agent --ignore-not-found
+          kubectl delete clusterrolebinding datadog-agent-cluster-agent --ignore-not-found
+
       - name: Deploy Datadog Agent with custom values
         env:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
