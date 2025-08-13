@@ -13,3 +13,14 @@ readinessProbe:
 livenessProbe:
   path: /hello
   port: 8080
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: grayent.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: "/"
