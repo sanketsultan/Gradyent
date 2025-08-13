@@ -30,11 +30,11 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Uninstall existing Datadog Agent Helm release
-        run: |
-          helm uninstall datadog-agent
-          kubectl delete clusterrole datadog-agent-cluster-agent --ignore-not-found
-          kubectl delete clusterrolebinding datadog-agent-cluster-agent --ignore-not-found
+      # - name: Uninstall existing Datadog Agent Helm release
+      #   run: |
+      #     helm uninstall datadog-agent
+      #     kubectl delete clusterrole datadog-agent-cluster-agent --ignore-not-found
+      #     kubectl delete clusterrolebinding datadog-agent-cluster-agent --ignore-not-found
 
       - name: Deploy Datadog Agent with custom values
         env:
