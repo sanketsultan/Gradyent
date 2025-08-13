@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       test_type:
-          description: 'Type of test to run'
-          required: true
-          default: 'smoke'
-          options:
-            - smoke
-            - load
+        description: 'Type of test to run'
+        required: true
+        default: 'smoke'
+        options:
+          - smoke
+          - load
       request_count:
         description: 'Number of requests for load test'
         required: false
