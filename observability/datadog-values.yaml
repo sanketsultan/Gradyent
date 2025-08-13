@@ -1,5 +1,4 @@
 datadog:
-  apiKey: ${DATADOG_API_KEY}
   site: "datadoghq.eu"
 daemonset:
   nodeSelector: {}
