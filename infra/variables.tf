@@ -81,7 +81,7 @@ variable "node_min_capacity" {
 variable "node_instance_types" {
   description = "List of EC2 instance types for worker nodes"
   type        = list(string)
-  default     = ["t2.micro"]
+  default     = ["t3.medium"]
 }
 
 variable "create_state_resources" {
