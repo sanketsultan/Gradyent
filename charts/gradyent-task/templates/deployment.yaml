@@ -14,6 +14,16 @@ spec:
       labels:
         app: {{ include "gradyent-task.name" . }}
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - {{ include "gradyent-task.name" . }}
+              topologyKey: "topology.kubernetes.io/zone"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

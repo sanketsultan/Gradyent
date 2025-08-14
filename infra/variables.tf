@@ -64,19 +64,19 @@ variable "kubernetes_version" {
 variable "node_desired_capacity" {
   description = "Desired number of worker nodes"
   type        = number
-  default     = 5
+  default     = 2
 }
 
 variable "node_max_capacity" {
   description = "Maximum number of worker nodes"
   type        = number
-  default     = 10
+  default     = 3
 }
 
 variable "node_min_capacity" {
   description = "Minimum number of worker nodes"
   type        = number
-  default     = 3
+  default     = 1
 }
 
 variable "node_instance_types" {
