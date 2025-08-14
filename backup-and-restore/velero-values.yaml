@@ -1,13 +1,39 @@
+initContainers:
+- name: velero-plugin-for-aws
+  image: velero/velero-plugin-for-aws:v1.9.0
+  imagePullPolicy: IfNotPresent
+  volumeMounts:
+    - mountPath: /target
+      name: plugins
+
 configuration:
   backupStorageLocation:
-    - name: default
-      provider: aws
+    - provider: aws
+      name: gradyent-velero-backups
       bucket: gradyent-velero-backups
+      default: true
       config:
         region: eu-west-1
         s3ForcePathStyle: true
-  upgradeCRDs: false
-serviceAccount:
-  server:
-    annotations:
-      eks.amazonaws.com/role-arn: "${VELERO_IAM_ROLE_ARN}"
+        s3Url: https://s3.eu-west-1.amazonaws.com
+  volumeSnapshotLocation:
+    - name: gradyent-velero-backups
+      provider: aws
+      pluginConfig:
+        idname: gradyent-velero-backups
+        config:
+          region: eu-west-1
+credentials:
+  secretContents: ## enter access and secret key to ec2 bucket. This configuration will create kubernetes secret.
+    cloud: |
+      [default]
+      aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+      aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+  ##existingSecret: ## If you want to use existing secret, created from sealed secret, then use this variable and omit credentials.secretContents.
+schedules:
+  gradyent-app:
+    disabled: false
+    schedule: "0 2 * * *" 
+    template:
+      ttl: "240h" ## choose ttl, after which the backups will be removed.
+      snapshotVolumes: false
