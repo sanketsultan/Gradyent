@@ -4,9 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       deploy:
-        description: 'Choose which agent to deploy: datadog, velero, both'
+        description: 'Choose which agent to deploy'
         required: true
         default: 'none'
+        type: choice
+        options:
+          - none
+          - datadog
+          - velero
+          - both
 
 jobs:
   uninstall:
