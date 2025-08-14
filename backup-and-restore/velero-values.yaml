@@ -6,6 +6,7 @@ configuration:
       config:
         region: eu-west-1
         s3ForcePathStyle: true
+  upgradeCRDs: false
 serviceAccount:
   server:
     annotations:
