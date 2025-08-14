@@ -63,11 +63,13 @@ resource "aws_iam_role_policy_attachment" "velero" {
   policy_arn = aws_iam_policy.velero.arn
 }
 
+
+provider "kubernetes" {
+  config_path    = "~/.kube/config"
+  config_context = "arn:aws:eks:${var.aws_region}:${var.aws_account_id}:cluster/${var.cluster_name}"
+}
+
 provider "helm" {
-  kubernetes {
-    config_path = "~/.kube/config"
-    config_context = "arn:aws:eks:${var.aws_region}:${var.aws_account_id}:cluster/${var.cluster_name}"
-  }
 }
 
 resource "helm_release" "velero" {
