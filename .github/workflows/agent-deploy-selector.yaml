@@ -95,15 +95,12 @@ jobs:
         with:
           version: 'latest'
       - name: Deploy Velero
-        env:
-          VELERO_IAM_ROLE_ARN: ${{ secrets.VELERO_IAM_ROLE_ARN }}
         run: |
           helm repo add vmware-tanzu https://vmware-tanzu.github.io/helm-charts
           helm repo update
           helm upgrade --install velero vmware-tanzu/velero \
             --namespace velero --create-namespace \
-            -f backup-and-restore/velero-values.yaml \
-            --set serviceAccount.server.annotations."eks.amazonaws.com/role-arn"=$VELERO_IAM_ROLE_ARN
+            -f backup-and-restore/velero-values.yaml
       - name: Check Velero pods status
         run: |
           kubectl get pods -n velero
