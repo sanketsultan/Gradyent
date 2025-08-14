@@ -63,51 +63,10 @@ resource "aws_iam_role_policy_attachment" "velero" {
   policy_arn = aws_iam_policy.velero.arn
 }
 
-
-
-provider "helm" {
-}
-
-resource "helm_release" "velero" {
-  name       = "velero"
-  repository = "https://vmware-tanzu.github.io/helm-charts"
-  chart      = "velero"
-  namespace  = "velero"
-  create_namespace = true
-  set {
-    name  = "configuration.provider"
-    value = "aws"
-  }
-  set {
-    name  = "configuration.backupStorageLocation.name"
-    value = "default"
-  }
-  set {
-    name  = "configuration.backupStorageLocation.bucket"
-    value = aws_s3_bucket.velero.bucket
-  }
-  set {
-    name  = "configuration.backupStorageLocation.config.region"
-    value = var.aws_region
-  }
-  set {
-    name  = "configuration.backupStorageLocation.config.s3ForcePathStyle"
-    value = "true"
-  }
-  set {
-    name  = "credentials.useSecret"
-    value = "true"
-  }
-  set {
-    name  = "initContainers[0].name"
-    value = "velero-plugin-for-aws"
-  }
-  set {
-    name  = "initContainers[0].image"
-    value = "velero/velero-plugin-for-aws:v1.12.1"
-  }
-  set {
-    name  = "serviceAccount.server.annotations[eks.amazonaws.com/role-arn]"
-    value = aws_iam_role.velero.arn
+// create namespace
+resource "kubernetes_namespace" "velero" {
+  metadata {
+    name = "velero"
   }
 }
+

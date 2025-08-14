@@ -1,3 +1,50 @@
+# Velero IAM role for backup/restore (IRSA)
+resource "aws_iam_role" "velero" {
+	name = "velero-irsa-role"
+	assume_role_policy = jsonencode({
+		Version = "2012-10-17"
+		Statement = [{
+			Effect = "Allow"
+			Principal = {
+				Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${module.eks.cluster_oidc_issuer_url}"
+			}
+			Action = "sts:AssumeRoleWithWebIdentity"
+			Condition = {
+				StringEquals = {
+					"${module.eks.cluster_oidc_issuer_url}:sub" = "system:serviceaccount:velero:velero"
+				}
+			}
+		}]
+	})
+}
+
+resource "aws_iam_policy" "velero" {
+	name        = "velero-s3-policy"
+	description = "Velero access to S3 for backups"
+	policy      = jsonencode({
+		Version = "2012-10-17"
+		Statement = [
+			{
+				Effect = "Allow"
+				Action = [
+					"s3:GetObject",
+					"s3:PutObject",
+					"s3:DeleteObject",
+					"s3:ListBucket"
+				]
+				Resource = [
+					"arn:aws:s3:::gradyent-velero-backups",
+					"arn:aws:s3:::gradyent-velero-backups/*"
+				]
+			}
+		]
+	})
+}
+
+resource "aws_iam_role_policy_attachment" "velero" {
+	role       = aws_iam_role.velero.name
+	policy_arn = aws_iam_policy.velero.arn
+}
 resource "aws_iam_role" "eks_node_group_role" {
 	name = "eks-node-group-role"
 	assume_role_policy = data.aws_iam_policy_document.eks_node_group_assume_role_policy.json
@@ -34,61 +81,6 @@ resource "aws_iam_role_policy_attachment" "eks_worker_node_AmazonEBSCSIDriverPol
 	role       = aws_iam_role.eks_node_group_role.name
 }
 
-# Example IRSA role for Kubernetes service account
-resource "aws_iam_role" "irsa_role" {
-	name = "eks-irsa-role"
-	assume_role_policy = data.aws_iam_policy_document.irsa_assume_role_policy.json
-}
-
-data "aws_iam_policy_document" "irsa_assume_role_policy" {
-	statement {
-		actions = ["sts:AssumeRoleWithWebIdentity"]
-		principals {
-			type        = "Federated"
-			identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${module.eks.cluster_oidc_issuer_url}"]
-		}
-		condition {
-			test     = "StringEquals"
-			variable = "${module.eks.cluster_oidc_issuer_url}:sub"
-			values   = ["system:serviceaccount:default:example-sa"]
-		}
-	}
-}
-
-data "aws_caller_identity" "current" {}
-
-# Inline policy for the IAM user running Terraform to read EKS AMI SSM parameters
-data "aws_iam_policy_document" "ssm_read_eks_ami_params" {
-	statement {
-		sid     = "AllowReadEKSAMIParams"
-		effect  = "Allow"
-		actions = [
-			"ssm:GetParameter",
-			"ssm:GetParameters",
-			"ssm:GetParametersByPath",
-			"ssm:DescribeParameters"
-		]
-		resources = [
-			"arn:aws:ssm:${var.aws_region}:*:parameter/aws/service/eks/*"
-		]
-	}
-
-	# Some lookups may require describing images; this action doesn't support resource-level permissions
-	statement {
-		sid     = "AllowDescribeImages"
-		effect  = "Allow"
-		actions = [
-			"ec2:DescribeImages"
-		]
-		resources = ["*"]
-	}
-}
-
-resource "aws_iam_user_policy" "gradyent_ssm_read" {
-	name   = "AllowReadEKSAMIParams"
-	user   = "gradyent"
-	policy = data.aws_iam_policy_document.ssm_read_eks_ami_params.json
-}
 
 
 
