@@ -6,3 +6,7 @@ configuration:
       config:
         region: eu-west-1
         s3ForcePathStyle: true
+serviceAccount:
+  server:
+    annotations:
+      eks.amazonaws.com/role-arn: "${VELERO_IAM_ROLE_ARN}"
