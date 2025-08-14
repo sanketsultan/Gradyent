@@ -1,0 +1,8 @@
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: aws
+      bucket: gradyent-velero-backups
+      config:
+        region: eu-west-1
+        s3ForcePathStyle: true

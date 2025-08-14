@@ -101,15 +101,8 @@ jobs:
           helm repo add vmware-tanzu https://vmware-tanzu.github.io/helm-charts
           helm repo update
           helm upgrade --install velero vmware-tanzu/velero \
-            --namespace velero \
-            --set configuration.provider=aws \
-            --set configuration.backupStorageLocation.name=default \
-            --set configuration.backupStorageLocation.bucket=gradyent-velero-backups \
-            --set configuration.backupStorageLocation.config.region=${{ secrets.AWS_REGION }} \
-            --set configuration.backupStorageLocation.config.s3ForcePathStyle=true \
-            --set credentials.useSecret=true \
-            --set initContainers[0].name=velero-plugin-for-aws \
-            --set initContainers[0].image=velero/velero-plugin-for-aws:v1.12.1 \
+            --namespace velero --create-namespace \
+            -f backup-and-restore/velero-values.yaml \
             --set serviceAccount.server.annotations."eks.amazonaws.com/role-arn"=$VELERO_IAM_ROLE_ARN
       - name: Check Velero pods status
         run: |
