@@ -101,6 +101,77 @@ make destroy
 
 ---
 
+## Step 8: Set Up Datadog Monitoring
+
+Integrate Datadog for enhanced observability:
+
+1. Add your Datadog API key to your secrets.
+2. Update the values in `observability/datadog-values.yaml`.
+3. Deploy the Datadog agent:
+
+    ```sh
+    helm upgrade --install datadog-agent datadog/datadog \
+      --namespace observability --create-namespace \
+      -f observability/datadog-values.yaml
+    ```
+
+> ![Screenshot: Datadog Setup](screenshots/datadog-setup.png)
+> ![Screenshot: Datadog Setup](screenshots/datadog-UI.png)
+
+---
+
+## Step 9: Run SAST Scanning
+
+Ensure code security with Static Application Security Testing (SAST):
+
+1. Integrate SAST tools (e.g., Datadog Static Analysis) in your CI/CD pipeline.
+
+https://github.com/sanketsultan/Gradyent/actions/workflows/datadog-static-analysis.yml
+
+2. Example GitHub Actions step:
+
+    ```yaml
+    - name: Run Datadog Static Analysis
+      uses: DataDog/datadog-static-analysis-action@v1
+      with:
+        api-key: ${{ secrets.DATADOG_API_KEY }}
+    ```
+    ```
+
+> ![Screenshot: SAST Scan](screenshots/sast-scan.png)
+> ![Screenshot: SAST Scan](screenshots/sast-analyzer.png)
+
+---
+
+## Step 10: Backup and Restore
+
+Protect your cluster and data with Velero:
+
+1. Configure Velero using files in `backup-and-restore/`.
+2. Install Velero:
+
+    ```sh
+    helm upgrade --install velero vmware-tanzu/velero \
+      --namespace velero --create-namespace \
+      -f backup-and-restore/velero-values.yaml
+    ```
+> ![Screenshot: SAST Scan](screenshots/velero-schedule.png)
+
+3. To back up:
+
+    ```sh
+    velero backup create gradyent-backup --include-namespaces gradyent-task
+    ```
+
+4. To restore:
+
+    ```sh
+    velero restore create --from-backup gradyent-backup
+    ```
+
+
+---
+
 ## File Structure
 
 - `infra/` – Terraform scripts for AWS infrastructure
