@@ -3,6 +3,8 @@
 I started by planning what I needed: reliable and scalable infrastructure, good security, clear monitoring, automatic backups, and smooth deployments. I chose AWS EKS for managed Kubernetes, Terraform for infrastructure as code, and Helm for app deployment. For backup and restore, I selected Velero to automate cluster and volume backups. For observability, I integrated Datadog to monitor metrics and logs. To automate deployments and testing, I set up GitHub Actions workflows for CI/CD. To keep code secure, I added Static Application Security Testing (SAST) to the CI/CD pipeline, ensuring vulnerabilities are caught before deployment. I made sure everything was automated, so anyone could repeat my process and get the same results.
 
 ---
+## Architecture
+![Architecture Diagram](screenshots/arch.png)
 
 ## Setting Up AWS Credentials
 
